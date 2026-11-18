@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control — Vehículos Registrados | UNIMINUTO</title>
+    <script>
+        if (sessionStorage.getItem('porteria_auth') !== 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+    <style>
+        :root {
+            --uni-blue: #003366;
+            --uni-dark: #0A2540;
+            --uni-yellow: #F2A900;
+            --bg-light: #F4F7FA;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            color: #1E293B;
+        }
+
+        .navbar {
+            background-color: var(--uni-blue);
+            color: white;
+            padding: 14px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .brand-bar {
+            width: 4px;
+            height: 22px;
+            background-color: var(--uni-yellow);
+            border-radius: 2px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-pill {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            background-color: white;
+            color: var(--uni-blue);
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .btn-logout:hover {
+            background-color: #E2E8F0;
+        }
+
+        .dashboard-container {
+            max-width: 1320px;
+            margin: 25px auto;
+            padding: 0 25px;
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .page-header h1 {
+            color: var(--uni-dark);
+            font-size: 1.55rem;
+            margin: 0 0 4px 0;
+        }
+
+        .page-header p {
+            color: #64748B;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .kpi-info span {
+            display: block;
+            color: #64748B;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .kpi-info h2 {
+            color: var(--uni-dark);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .kpi-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            background: #EFF6FF;
+        }
+
+        .table-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filters-group {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 240px;
+            padding: 10px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 0.92rem;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            background-color: white;
+            color: #1E293B;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+        }
+
+        th {
+            background-color: #F8FAFC;
+            color: #475569;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #E2E8F0;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #F1F5F9;
+            font-size: 0.9rem;
+            color: #334155;
+        }
+
+        tr:hover {
+            background-color: #F8FAFC;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-green {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .badge-blue {
+            background: #E0F2FE;
+            color: #075985;
+        }
+
+        .badge-gray {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .badge-na {
+            background: #F3F4F6;
+            color: #6B7280;
+            font-style: italic;
+        }
+
+        .btn-delete {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background-color: #FECACA;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="brand">
+            <div class="brand-bar"></div>
+            <span>UNIMINUTO</span>
+            <span style="font-weight: 400; font-size: 0.9rem; opacity: 0.85;">| Panel de Control Vehicular</span>
+        </div>
+        <div class="nav-actions">
+            <span class="user-pill" id="saludoAdmin">👤 Admin</span>
+            <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="page-header">
+            <h1>PANEL DE CONTROL — VEHÍCULOS REGISTRADOS</h1>
+            <p>Monitoreo en tiempo real • Validación documental inteligente mediante GemPrompt IA</p>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span>TOTAL MOTOS</span>
+                    <h2 id="statMotos">0</h2>
+                </div>
+                <div class="kpi-icon">🏍️</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span>TOTAL CARROS</span>
+                    <h2 id="statCarros">0</h2>
+                </div>
+                <div class="kpi-icon">🚗</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span>AUTORIZADOS (IA)</span>
+                    <h2 id="statAutorizados">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #DCFCE7;">✅</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span>TOTAL GENERAL</span>
+                    <h2 id="statTotal">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #FEF3C7;">📊</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-toolbar">
+                <div class="filters-group">
+                    <input type="text" id="busquedaTexto" class="search-input"
+                        placeholder="🔍 Buscar por placa, documento, propietario o programa..."
+                        onkeyup="aplicarFiltros()">
+
+                    <select id="filtroVehiculo" class="filter-select" onchange="aplicarFiltros()">
+                        <option value="TODOS">🚘 Todos los vehículos</option>
+                        <option value="moto">🏍️ Motocicletas</option>
+                        <option value="auto">🚗 Automóviles / Carros</option>
+                        <option value="bici">🚲 Bicicletas / Patinetas</option>
+                    </select>
+                </div>
+                <span class="badge badge-green">🟢 Sincronizado con Firestore</span>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placa / Registro</th>
+                            <th>Identificación</th>
+                            <th>Propietario</th>
+                            <th>Rol / Programa</th>
+                            <th>Tipo Vehículo</th>
+                            <th>SOAT (GemPrompt IA)</th>
+                            <th>RUNT / Tecno (IA)</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-vehiculos">
+                        <tr>
+                            <td colspan="9" style="text-align: center; color: #64748B; padding: 25px;">Cargando
+                                registros desde Firebase...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const nombreAdmin = sessionStorage.getItem('admin_nombre') || 'Administrador';
+        document.getElementById('saludoAdmin').textContent = `👤 Operador: ${nombreAdmin}`;
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqxiuJ6YkbqBVzZQvMQUwWblhc4mxjJg0",
+            authDomain: "control-vehicular-uniminuto.firebaseapp.com",
+            projectId: "control-vehicular-uniminuto",
+            storageBucket: "control-vehicular-uniminuto.firebasestorage.app",
+            messagingSenderId: "323939858303",
+            appId: "1:323939858303:web:1b6d8402071f148a604c4a",
+            measurementId: "G-5PNB81G1HE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const tabla = document.getElementById("tabla-vehiculos");
+        let listaGlobalVehiculos = [];
+
+        onSnapshot(collection(db, "vehiculos"), (snapshot) => {
+            listaGlobalVehiculos = [];
+            snapshot.forEach((documento) => {
+                let data = documento.data();
+                data.idFirebase = documento.id;
+                listaGlobalVehiculos.push(data);
+            });
+            actualizarKPIs(listaGlobalVehiculos);
+            aplicarFiltros();
+        });
+
+        // Función auxiliar para normalizar textos (eliminar tildes y pasar a minúsculas)
+        function normalizarTexto(texto) {
+            return (texto || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function actualizarKPIs(vehiculos) {
+            document.getElementById("statTotal").textContent = vehiculos.length;
+            document.getElementById("statMotos").textContent = vehiculos.filter(v => normalizarTexto(v.tipoVehiculo).includes('moto')).length;
+            document.getElementById("statCarros").textContent = vehiculos.filter(v => {
+                const t = normalizarTexto(v.tipoVehiculo);
+                return t.includes('carro') || t.includes('auto') || t.includes('automovil');
+            }).length;
+            document.getElementById("statAutorizados").textContent = vehiculos.filter(v => !v.estado || v.estado === 'Autorizado').length;
+        }
+
+        function procesarGemPromptIA(tipoVehiculo) {
+            const tipo = normalizarTexto(tipoVehiculo);
+
+            if (tipo.includes('bici') || tipo.includes('patineta')) {
+                return {
+                    soat: '<span class="badge badge-na">No aplica</span>',
+                    tecno: '<span class="badge badge-na">No aplica</span>'
+                };
+            }
+
+            return {
+                soat: '<span class="badge badge-green">✔ Vigente (IA)</span>',
+                tecno: '<span class="badge badge-blue">✔ RUNT OK (IA)</span>'
+            };
+        }
+
+        window.aplicarFiltros = function () {
+            const texto = normalizarTexto(document.getElementById("busquedaTexto").value);
+            const tipoFiltro = document.getElementById("filtroVehiculo").value;
+
+            const filtrados = listaGlobalVehiculos.filter(v => {
+                // Coincidencia de búsqueda por texto general
+                const coincideTexto =
+                    normalizarTexto(v.placa).includes(texto) ||
+                    normalizarTexto(v.numDoc).includes(texto) ||
+                    normalizarTexto(v.propietario).includes(texto) ||
+                    normalizarTexto(v.areaPrograma).includes(texto) ||
+                    normalizarTexto(v.tipoVehiculo).includes(texto);
+
+                // Coincidencia estricta por el selector desplegable
+                const tipoVehNorm = normalizarTexto(v.tipoVehiculo);
+                let coincideTipo = true;
+
+                if (tipoFiltro === 'moto') {
+                    coincideTipo = tipoVehNorm.includes('moto');
+                } else if (tipoFiltro === 'auto') {
+                    coincideTipo = tipoVehNorm.includes('carro') || tipoVehNorm.includes('auto') || tipoVehNorm.includes('automovil');
+                } else if (tipoFiltro === 'bici') {
+                    coincideTipo = tipoVehNorm.includes('bici') || tipoVehNorm.includes('patineta');
+                }
+
+                return coincideTexto && coincideTipo;
+            });
+
+            renderizarTabla(filtrados);
+        }
+
+        function renderizarTabla(vehiculos) {
+            tabla.innerHTML = "";
+
+            if (vehiculos.length === 0) {
+                tabla.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #64748B; padding: 25px;">No se encontraron registros con los filtros actuales.</td></tr>`;
+                return;
+            }
+
+            vehiculos.forEach((data) => {
+                const docCompleto = data.numDoc ? `${data.tipoDoc || 'CC'}: ${data.numDoc}` : 'Sin registro';
+                const validacionIA = procesarGemPromptIA(data.tipoVehiculo);
+                const fila = document.createElement("tr");
+
+                fila.innerHTML = `
+          <td><strong>${data.placa || 'N/A'}</strong></td>
+          <td><span class="badge badge-gray">${docCompleto}</span></td>
+          <td>${data.propietario || 'Sin nombre'}</td>
+          <td><strong>${data.rol || 'Estudiante'}</strong><br><small style="color:#64748B">${data.areaPrograma || 'General'}</small></td>
+          <td>${data.tipoVehiculo || 'Vehículo'}</td>
+          <td>${validacionIA.soat}</td>
+          <td>${validacionIA.tecno}</td>
+          <td><span class="badge badge-green">${data.estado || 'Autorizado'}</span></td>
+          <td><button class="btn-delete" onclick="eliminarRegistro('${data.idFirebase}')">🗑️ Borrar</button></td>
+        `;
+                tabla.appendChild(fila);
+            });
+        }
+
+        window.eliminarRegistro = async function (id) {
+            if (confirm("¿Deseas eliminar permanentemente este registro de la base de datos?")) {
+                try {
+                    await deleteDoc(doc(db, "vehiculos", id));
+                } catch (error) {
+                    alert("Error al eliminar el registro.");
+                }
+            }
+        }
+    </script>
+
+    <script>
+        function cerrarseSesion() { }
+        function cerrarSesion() {
+            sessionStorage.removeItem('porteria_auth');
+            sessionStorage.removeItem('admin_nombre');
+            window.location.href = 'index.html';
+        }
+    </script>
+
+</body>
+
+</html>

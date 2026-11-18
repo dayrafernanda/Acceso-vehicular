@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control Vehicular — UNIMINUTO</title>
+    <style>
+        :root {
+            --uni-blue: #003366;
+            --uni-dark: #0A2540;
+            --uni-yellow: #F2A900;
+            --bg-light: #F4F7FA;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1E293B;
+        }
+
+        /* Barra superior estilo Figma */
+        .navbar {
+            background-color: var(--uni-blue);
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-bar {
+            width: 4px;
+            height: 24px;
+            background-color: var(--uni-yellow);
+            border-radius: 2px;
+        }
+
+        .nav-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            font-weight: 400;
+        }
+
+        /* Contenedor Principal */
+        .main-wrapper {
+            flex: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 45px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .pill-tag {
+            display: inline-block;
+            background-color: #E0E7FF;
+            color: var(--uni-blue);
+            font-weight: 700;
+            font-size: 0.78rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            color: var(--uni-dark);
+            font-size: 2.1rem;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #64748B;
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+
+        /* Grid de 3 Tarjetas (Mockup 01) */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        .role-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 30px 25px;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .role-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(0, 51, 102, 0.1);
+            border-color: #CBD5E1;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background-color: #EFF6FF;
+            color: var(--uni-blue);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 18px;
+        }
+
+        .role-card h2 {
+            color: var(--uni-dark);
+            margin: 0 0 8px 0;
+            font-size: 1.25rem;
+        }
+
+        .role-card p {
+            color: #64748B;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0 0 24px 0;
+        }
+
+        .btn-card {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--uni-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .btn-card:hover {
+            background-color: #002244;
+        }
+
+        .btn-card.admin-btn {
+            background-color: var(--uni-dark);
+        }
+
+        /* Distintivo de Seguridad y Datos */
+        .security-footer {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #475569;
+            margin: 0 auto;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 37, 64, 0.7);
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 390px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .qr-frame {
+            background: #F8FAFC;
+            border: 2px dashed #CBD5E1;
+            padding: 16px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--uni-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+            display: inline-block;
+            box-sizing: border-box;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: #64748B;
+            margin-top: 14px;
+            cursor: pointer;
+            font-size: 0.88rem;
+        }
+
+        .error-msg {
+            color: #DC2626;
+            font-size: 0.85rem;
+            display: none;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Barra Superior UNIMINUTO -->
+    <header class="navbar">
+        <div class="brand">
+            <div class="brand-bar"></div>
+            <span>UNIMINUTO</span>
+            <span class="nav-subtitle">| Sistema de Control Vehicular</span>
+        </div>
+        <div class="nav-subtitle">Campus Universitario</div>
+    </header>
+
+    <!-- Contenido Central -->
+    <main class="main-wrapper">
+        <div>
+            <span class="pill-tag">ACCESO AL CAMPUS</span>
+            <h1>BIENVENIDO AL SISTEMA DE CONTROL VEHICULAR</h1>
+            <p class="subtitle">Selecciona tu perfil para registrar tu ingreso o gestionar el acceso al campus</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Tarjeta Estudiante -->
+            <div class="role-card">
+                <div>
+                    <div class="icon-box">🎓</div>
+                    <h2>Estudiante</h2>
+                    <p>Registra el ingreso de tu motocicleta, automóvil o bicicleta mediante el código QR institucional.
+                    </p>
+                </div>
+                <button class="btn-card" onclick="abrirQR('Estudiante')">
+                    <span>Ingresar como estudiante</span>
+                    <span>→</span>
+                </button>
+            </div>
+
+            <!-- Tarjeta Docente -->
+            <div class="role-card">
+                <div>
+                    <div class="icon-box">👨‍🏫</div>
+                    <h2>Docente</h2>
+                    <p>Gestiona tu ingreso vehicular al campus y valida tus documentos de circulación.</p>
+                </div>
+                <button class="btn-card" onclick="abrirQR('Docente')">
+                    <span>Ingresar como docente</span>
+                    <span>→</span>
+                </button>
+            </div>
+
+            <!-- Tarjeta Administrador -->
+            <div class="role-card">
+                <div>
+                    <div class="icon-box">🛡️</div>
+                    <h2>Administrador</h2>
+                    <p>Panel de portería y seguridad para monitoreo en tiempo real, filtros y validación IA.</p>
+                </div>
+                <button class="btn-card admin-btn" onclick="abrirLogin()">
+                    <span>Ingresar como administrador</span>
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Distintivo de Seguridad y Tratamiento de Datos -->
+        <div class="security-footer">
+            <span>🔒</span>
+            <span>Acceso seguro • Protegido bajo Políticas de Seguridad y Tratamiento de Datos Personales (Ley 1581 de
+                2012)</span>
+        </div>
+    </main>
+
+    <!-- Modal QR Global (Para Estudiantes y Docentes) -->
+    <div class="modal-overlay" id="modalQR">
+        <div class="modal-box">
+            <span class="pill-tag" id="badgePerfilQR">REGISTRO DE INGRESO</span>
+            <h2 style="color: #0A2540; margin: 5px 0;">Escanea el Código QR</h2>
+            <p style="font-size: 0.88rem; color: #64748B;">Apunta la cámara de tu celular para diligenciar el formulario
+                de ingreso vehicular.</p>
+
+            <div class="qr-frame">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://docs.google.com/forms/d/e/1FAIpQLSdFGL-ApX0fftLu51VvN9aInyXZD5m0IG91cW3a0dQrDS2Qqg/viewform"
+                    alt="QR Global UNIMINUTO" style="width: 210px; height: 210px; display: block;">
+            </div>
+
+            <p style="font-size: 0.78rem; color: #475569; background: #F1F5F9; padding: 8px; border-radius: 6px;">
+                🛡️ Tus datos de identificación y placa están protegidos por la política de privacidad institucional.
+            </p>
+
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdFGL-ApX0fftLu51VvN9aInyXZD5m0IG91cW3a0dQrDS2Qqg/viewform"
+                target="_blank" class="btn-primary">Abrir Formulario Directamente</a>
+            <button class="btn-close" onclick="cerrarModales()">Cerrar ventana</button>
+        </div>
+    </div>
+
+    <!-- Modal Login Administradores -->
+    <div class="modal-overlay" id="modalLogin">
+        <div class="modal-box">
+            <span class="pill-tag">SEGURIDAD Y PORTERÍA</span>
+            <h2 style="color: #0A2540; margin: 5px 0;">Acceso Administrativo</h2>
+            <p style="font-size: 0.88rem; color: #64748B; margin-bottom: 15px;">Ingresa tus credenciales de
+                creador/operador</p>
+
+            <input type="text" id="usuario" placeholder="Usuario (dayra, angel, diana, andres)">
+            <input type="password" id="clave" placeholder="Contraseña"
+                onkeypress="if(event.key==='Enter') verificarAcceso()">
+
+            <div class="error-msg" id="errorLogin">Usuario o contraseña incorrectos.</div>
+
+            <button class="btn-primary" onclick="verificarAcceso()">Acceder al Panel</button>
+            <button class="btn-close" onclick="cerrarModales()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        function abrirQR(perfil) {
+            document.getElementById('badgePerfilQR').textContent = `INGRESO ${perfil.toUpperCase()}`;
+            document.getElementById('modalQR').style.display = 'flex';
+        }
+
+        function abrirLogin() {
+            document.getElementById('modalLogin').style.display = 'flex';
+            document.getElementById('usuario').focus();
+        }
+
+        function cerrarModales() {
+            document.getElementById('modalQR').style.display = 'none';
+            document.getElementById('modalLogin').style.display = 'none';
+            document.getElementById('errorLogin').style.display = 'none';
+        }
+
+        function verificarAcceso() {
+            const user = document.getElementById('usuario').value.trim().toLowerCase();
+            const pass = document.getElementById('clave').value.trim();
+
+            const usuariosValidos = {
+                "dayra": { pass: "Uniminuto2026*Dayra", nombre: "Dayra" },
+                "angel": { pass: "Uniminuto2026*Angel", nombre: "Angel" },
+                "diana": { pass: "Uniminuto2026*Diana", nombre: "Diana" },
+                "andres": { pass: "Uniminuto2026*Andres", nombre: "Andres" }
+            };
+
+            if (usuariosValidos[user] && usuariosValidos[user].pass === pass) {
+                sessionStorage.setItem('porteria_auth', 'true');
+                sessionStorage.setItem('admin_nombre', usuariosValidos[user].nombre);
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('errorLogin').style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
